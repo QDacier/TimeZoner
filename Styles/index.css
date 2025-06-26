@@ -79,6 +79,7 @@ body {
     align-items: center;
     margin-top: 20px; /* Reduced from 30px */
     margin-bottom: 20px; /* Reduced from 30px */
+    display: none; /* Hidden by default, shown on city search */
 }
 
 #horlogeBG {
@@ -86,15 +87,52 @@ body {
     height: 300px;
     border: 8px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    position: relative;
+    position: relative; /* Crucial for positioning hands */
     background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 45px rgba(0, 0, 0, 0.5);
-
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* --- Clock Hands (Aiguilles) (Adjusted Size) --- */
+/* --- Hour Marks (Numbers and Lines) --- */
+.hour-mark-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* This container pivots from its top-left corner (which is at the clock's center) */
+    transform-origin: 0 0;
+    /* Rotate the container using the custom property defined in HTML */
+    transform: rotate(var(--rotation));
+    z-index: 6; /* Placed below clock hands, above clock background */
+}
+
+/* Common positioning for the actual number/line elements inside their rotated containers */
+.hour-number, .hour-line {
+    position: absolute; /* Position relative to their rotated container */
+    left: 0; /* Align left edge with the container's vertical axis */
+    /* transform property will be set individually for numbers/lines */
+}
+
+.hour-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #ecf0f1;
+    /* NEW: Adjust top to move numbers closer to the border */
+    top: -155px; /* Changed from -120px to -140px. Adjust further if needed. */
+    /* NEW: Counter-rotate the number to keep it upright */
+    transform: translateX(-50%) rotate(calc(-1 * var(--rotation)));
+}
+
+.hour-line {
+    width: 3px; /* Thickness of the line */
+    height: 10px; /* Length of the line */
+    background-color: #ecf0f1;
+    border-radius: 2px;
+    top: -140px; /* Lines will also be closer to the border, adjust if different */
+    transform: translateX(-50%); /* Lines still rotate with the clock face */
+}
+
+/* --- Clock Hands (Aiguilles) --- */
 #centre {
     width: 15px;
     height: 15px;
@@ -103,65 +141,76 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); /* Centers the dot */
     z-index: 10;
 }
 
 .aiguille {
     position: absolute;
     background-color: #ecf0f1;
-    top: 50%;
-    left: 50%;
-    transform-origin: 0% 50%;
+    top: 50%; /* Position the element's top edge at the clock's vertical center */
+    left: 50%; /* Position the element's left edge at the clock's horizontal center */
+    transform-origin: 50% 100%; /* Keep this, it sets the pivot point correctly at the bottom-center of the hand */
     border-radius: 3px;
+    /* z-index is set below for specific hands */
 }
 
 #aigHr {
-    width: 25%;
-    height: 7px;
+    width: 7px; /* Make it a thin vertical rectangle */
+    height: 25%; /* Length of the hour hand relative to #horlogeBG height */
     background-color: #f39c12;
-    transform: translateY(-3.5px) rotate(120deg);
+    z-index: 7; /* Hour hand is usually behind minute but above background */
+    /* NO 'transform' property here, JavaScript will set it dynamically */
 }
 
 #aigMin {
-    width: 35%;
-    height: 6px;
+    width: 6px; /* Make it a thin vertical rectangle */
+    height: 35%; /* Length of the minute hand */
     background-color: #bdc3c7;
-    transform: translateY(-3px) rotate(210deg);
+    z-index: 8; /* Minute hand is usually above hour */
+    /* NO 'transform' property here, JavaScript will set it dynamically */
 }
 
 #aigSec {
-    width: 40%;
-    height: 3px;
+    width: 3px; /* Make it a thin vertical rectangle */
+    height: 40%; /* Length of the second hand */
     background-color: #e74c3c;
-    transform: translateY(-1.5px) rotate(300deg);
+    z-index: 9; /* Second hand is usually on top */
+    /* NO 'transform' property here, JavaScript will set it dynamically */
 }
 
 /* --- Sun and Moon (Adjusted Size) --- */
 #sun, #moon {
     position: absolute;
+    /* ***** MODIFICATIONS START HERE ***** */
+    top: 50%;           /* Essential: Place top edge at vertical center */
+    left: 50%;          /* Essential: Place left edge at horizontal center */
+    width: 60px;        /* Keeping your custom size */
+    height: 60px;       /* Keeping your custom size */
     border-radius: 50%;
     z-index: 5;
+    /* REMOVE CSS ANIMATIONS - JAVASCRIPT HANDLES POSITIONING */
+    animation: none; /* Explicitly turn off any conflicting animations */
+    transition: transform 0.1s linear; /* Keep this for smooth JS updates */
 }
 
 #sun {
-    width: 60px;
-    height: 60px;
     background: radial-gradient(circle at 60% 60%, #ffe066, #ffc107);
     box-shadow: 0 0 22px 7px rgba(255, 193, 7, 0.7);
-    animation: orbitSun 24s linear infinite;
 }
 
 #moon {
-    width: 50px;
-    height: 50px;
+    width: 50px; /* Keeping your custom size for moon */
+    height: 50px; /* Keeping your custom size for moon */
     background: radial-gradient(circle at 30% 30%, #ecf0f1, #bdc3c7);
     box-shadow: inset -7px -7px 15px rgba(0,0,0,0.3);
-    animation: orbitMoon 24s linear infinite;
 }
 
-
-/* --- Orbit Animations --- */
+/* ***** REMOVE THE @keyframes RULES BELOW THIS LINE *****
+   They are no longer needed as JavaScript now directly controls the transform.
+   Keeping them would create a conflict.
+*/
+/*
 @keyframes orbitSun {
     0% {
         top: 50%;
@@ -171,7 +220,7 @@ body {
     100% {
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) rotate(360deg) translateX(180px) rotate(-360deg);
+        transform: translate(-50%, -50%) rotate(-360deg) translateX(180px) rotate(360deg);
     }
 }
 
@@ -184,10 +233,10 @@ body {
     100% {
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%) rotate(540deg) translateX(180px) rotate(-540deg);
+        transform: translate(-50%, -50%) rotate(-180deg) translateX(180px) rotate(180deg);
     }
 }
-
+*/
 
 /* --- Text Elements (Adjusted Spacing) --- */
 #ville, #heure {
