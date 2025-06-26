@@ -1,0 +1,206 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #2c3e50;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ecf0f1;
+    overflow: hidden;
+}
+
+/* --- Search Bar --- */
+#search-bar-container {
+    position: absolute; /* Position relative to the body */
+    top: 20px; /* Distance from the top edge */
+    left: 20px; /* Distance from the left edge */
+    z-index: 100; /* Ensure it's on top of all other content */
+    display: flex; /* Use flexbox to align input and button */
+    gap: 8px; /* Space between the input and button */
+    padding: 10px; /* Padding around the container for a subtle box */
+    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker background for visibility */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+}
+
+#search-input {
+    padding: 10px 15px;
+    border: 2px solid #555;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.15); /* Slightly less transparent */
+    color: #ecf0f1;
+    font-size: 1.1em; /* Slightly larger font */
+    outline: none; /* Remove default focus outline */
+    width: 220px; /* Adjust width as needed */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Inner shadow for depth */
+}
+
+#search-input::placeholder {
+    color: rgba(236, 240, 241, 0.6); /* Lighter placeholder text */
+}
+
+#search-input:focus {
+    border-color: #3498db; /* Highlight border on focus */
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#search-button {
+    padding: 10px 18px; /* Adjusted padding for button */
+    border: none;
+    border-radius: 5px;
+    background-color: #3498db; /* A nice blue */
+    color: white;
+    font-size: 1.1em; /* Matches input font size */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+#search-button:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+#search-button:active {
+    background-color: #2073aa; /* Even darker on click */
+    transform: translateY(0);
+}
+
+
+/* --- Clock Container and Background Blur (Adjusted Size) --- */
+#horloge {
+    position: relative;
+    width: 450px;
+    height: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px; /* Reduced from 30px */
+    margin-bottom: 20px; /* Reduced from 30px */
+}
+
+#horlogeBG {
+    width: 300px;
+    height: 300px;
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    position: relative;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 45px rgba(0, 0, 0, 0.5);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* --- Clock Hands (Aiguilles) (Adjusted Size) --- */
+#centre {
+    width: 15px;
+    height: 15px;
+    background-color: #34495e;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.aiguille {
+    position: absolute;
+    background-color: #ecf0f1;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0% 50%;
+    border-radius: 3px;
+}
+
+#aigHr {
+    width: 25%;
+    height: 7px;
+    background-color: #f39c12;
+    transform: translateY(-3.5px) rotate(120deg);
+}
+
+#aigMin {
+    width: 35%;
+    height: 6px;
+    background-color: #bdc3c7;
+    transform: translateY(-3px) rotate(210deg);
+}
+
+#aigSec {
+    width: 40%;
+    height: 3px;
+    background-color: #e74c3c;
+    transform: translateY(-1.5px) rotate(300deg);
+}
+
+/* --- Sun and Moon (Adjusted Size) --- */
+#sun, #moon {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 5;
+}
+
+#sun {
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 60% 60%, #ffe066, #ffc107);
+    box-shadow: 0 0 22px 7px rgba(255, 193, 7, 0.7);
+    animation: orbitSun 24s linear infinite;
+}
+
+#moon {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle at 30% 30%, #ecf0f1, #bdc3c7);
+    box-shadow: inset -7px -7px 15px rgba(0,0,0,0.3);
+    animation: orbitMoon 24s linear infinite;
+}
+
+
+/* --- Orbit Animations --- */
+@keyframes orbitSun {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
+    }
+    100% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(360deg) translateX(180px) rotate(-360deg);
+    }
+}
+
+@keyframes orbitMoon {
+    0% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(180deg) translateX(180px) rotate(-180deg);
+    }
+    100% {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(540deg) translateX(180px) rotate(-540deg);
+    }
+}
+
+
+/* --- Text Elements (Adjusted Spacing) --- */
+#ville, #heure {
+    font-size: 2.2em;
+    font-weight: bold;
+    text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
+    z-index: 20;
+}
+
+#ville {
+    margin-bottom: 10px; /* Reduced from 15px */
+}
+
+#heure {
+    margin-top: 10px; /* Reduced from 15px */
+}
