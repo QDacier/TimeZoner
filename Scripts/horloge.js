@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-    // Get references to the DOM elements
+    // DOM
     const hourHand = document.getElementById('aigHr');
     const minuteHand = document.getElementById('aigMin');
     const secondHand = document.getElementById('aigSec');
@@ -12,78 +12,68 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
 
-    // --- Global Variables for Time and Location ---
-    let currentCity = "Search for a City";
-    let currentTimezoneOffset = 0; // Default to UTC, treated as 0 hours offset
-    let isCitySearched = false; // Flag to track if a city has been successfully searched
+    // ------------------- Global Variables for Time and Location -------------------
+    let currentCity = "Nom de ville";
+    let currentTimezoneOffset = 0;
+    let isCitySearched = false;
 
     // Function to update the clock hands and display
     function updateClock() {
-        const now = new Date(); // Get current date and time in local computer's timezone
+        const now = new Date();
         const utcHours = now.getUTCHours();
         const utcMinutes = now.getUTCMinutes();
         const utcSeconds = now.getUTCSeconds();
 
-        // Calculate time for the selected timezone based on the current offset
+        // Calcule du temps en fonction de la zone
         let localHours = (utcHours + currentTimezoneOffset + 24) % 24;
         const localMinutes = utcMinutes;
         const localSeconds = utcSeconds;
 
-        // --- Calculate Rotation Angles for Hands (CONDITIONAL) ---
+        // ------------------- calcule rotation des aiguilles -------------------
         let secondDegrees, minuteDegrees, hourDegrees;
 
-        if (isCitySearched) { // Only calculate and move hands based on searched city's time
+        if (isCitySearched) {
             secondDegrees = localSeconds * 6;
             minuteDegrees = (localMinutes * 6) + (localSeconds * 0.1);
             hourDegrees = (localHours * 30) + (localMinutes * 0.5);
-        } else { // Default to 12:00:00 (all hands pointing straight up) when no city is searched
+        } else {
             secondDegrees = 0;
             minuteDegrees = 0;
             hourDegrees = 0;
         }
 
-        // Apply Rotations to Hands (include translation for centering)
         hourHand.style.transform = `translate(-50%, -100%) rotate(${hourDegrees}deg)`;
         minuteHand.style.transform = `translate(-50%, -100%) rotate(${minuteDegrees}deg)`;
         secondHand.style.transform = `translate(-50%, -100%) rotate(${secondDegrees}deg)`;
 
-        // --- Update Digital Time Display (CONDITIONAL) ---
+        // ------------------- Update heure digital -------------------
         if (isCitySearched) {
             const formattedHours = String(localHours).padStart(2, '0');
             const formattedMinutes = String(localMinutes).padStart(2, '0');
             timeDisplay.textContent = `${formattedHours}:${formattedMinutes}`;
         } else {
-            timeDisplay.textContent = "--:--"; // Ensure it remains default
+            timeDisplay.textContent = "--:--";
         }
 
-        // --- Update City Display ---
+        // ------------------- Update la ville -------------------
         cityDisplay.textContent = currentCity;
 
-        // --- Control Sun and Moon Orbit (CONDITIONAL) ---
+        // ------------------- Controle le soleil et la lune en orbite -------------------
         let sunOrbitAngle, moonOrbitAngle;
         const orbitRadius = 180;
 
         if (isCitySearched) { // Animate sun/moon based on searched city's time
             const totalMinutesOfDay = localHours * 60 + localMinutes;
             const totalSecondsOfDay = totalMinutesOfDay * 60 + localSeconds;
-            // orbitProgressDegrees: 0 at 00:00, 90 at 06:00, 180 at 12:00, 270 at 18:00
             const orbitProgressDegrees = (totalSecondsOfDay / (24 * 3600)) * 360;
 
-            // Calculates sunOrbitAngle in YOUR system (0=Right, 90=Top, 180=Left, 270=Bottom, CCW)
             sunOrbitAngle = (orbitProgressDegrees - 90 + 360) % 360;
-            moonOrbitAngle = (sunOrbitAngle + 180) % 360; // Moon is always opposite the sun
+            moonOrbitAngle = (sunOrbitAngle + 180) % 360;
 
-            // Calculate the final rotation angle for the CSS transform using translateX for radial positioning.
-            // This converts your (0=Right, 90=Top, CCW) angle to the (0=Right, 90=Bottom, CW) angle needed by rotate() + translateX().
+            // Calcule la rotation du solei let de la lne avec css
             const finalRotateSunAngle = (-sunOrbitAngle + 360) % 360;
             const finalRotateMoonAngle = (-moonOrbitAngle + 360) % 360;
 
-            // Apply the transform.
-            // 1. translate(-50%, -50%): Centers the element itself.
-            // 2. rotate(finalRotateAngle): Rotates the element's coordinate system to the desired angle.
-            //    (0=Right, 90=Bottom, 180=Left, 270=Top, CW)
-            // 3. translateX(orbitRadius): Moves the element outwards along its now-rotated X-axis.
-            // 4. rotate(-finalRotateAngle): Counter-rotates the element itself to keep its icon upright.
             sun.style.transform = `translate(-50%, -50%) rotate(${finalRotateSunAngle}deg) translateX(${orbitRadius}px) rotate(${-finalRotateSunAngle}deg)`;
             moon.style.transform = `translate(-50%, -50%) rotate(${finalRotateMoonAngle}deg) translateX(${orbitRadius}px) rotate(${-finalRotateMoonAngle}deg)`;
 
@@ -103,7 +93,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
              moon.style.transform = `translate(-50%, -50%) rotate(${finalRotateMoonAngle}deg) translateX(${orbitRadius}px) rotate(${-finalRotateMoonAngle}deg)`;
         }
 
-        // --- Day/Night Background Color Change (CONDITIONAL) ---
+        // ------------------- Day/Night Background Color Change -------------------
         if (isCitySearched) { // Change background based on local time if a city is searched
             let r, g, b;
             // Define colors for day and night transitions
@@ -145,7 +135,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    // --- Search Functionality ---
+    // ------------------- recherche -------------------
     async function searchCity() {
         const city = searchInput.value.trim();
         if (!city) {
@@ -154,13 +144,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
 
         const mockTimezones = {
-            "quebec city": -4,
-            "montreal": -4,
+            "québec": -4,
+            "washington": -4,
+            "montréal": -4,
             "toronto": -4,
             "vancouver": -7,
-            "london": 1,
+            "londres": 1,
+            "rabat": 1,
             "paris": 2,
             "tokyo": 9,
+            "bruxelles": 2,
             "new york": -4,
             "los angeles": -7,
             "sydney": 10,
@@ -172,20 +165,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (mockTimezones.hasOwnProperty(lowerCaseCity)) {
             currentTimezoneOffset = mockTimezones[lowerCaseCity];
             currentCity = city;
-            isCitySearched = true; // Set flag to true on successful search
+            isCitySearched = true;
+            horlogeContainer.style.display = 'flex';
 
-            horlogeContainer.style.display = 'flex'; // Make the clock visible
-
-            updateClock(); // Update clock with new city's time immediately
-            searchInput.value = ''; // Clear search input
+            updateClock();
+            searchInput.value = '';
         } else {
-            alert(`Could not find timezone for "${city}". Please try a different city or ensure it's in our mock list.`);
-            isCitySearched = false; // Ensure flag is false if search fails
-            horlogeContainer.style.display = 'none'; // Re-hide clock if search fails after being visible
-            cityDisplay.textContent = "Search for a City"; // Reset text
-            timeDisplay.textContent = "--:--"; // Reset time display
+            alert(`La ville "${city}" est introuvable dans ma liste`);
+            isCitySearched = false;
+            horlogeContainer.style.display = 'none';
+            cityDisplay.textContent = "Cherche une ville";
+            timeDisplay.textContent = "--:--";
 
-            // Reset hands to default 12:00 position when search fails (include translation)
+            // Reset les aiguilles 12:00
             hourHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
             minuteHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
             secondHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
@@ -205,13 +197,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // --- Initial state setup ---
     cityDisplay.textContent = "Search for a City";
     timeDisplay.textContent = "--:--";
-    horlogeContainer.style.display = 'none'; // Ensure clock is hidden on initial load
-    isCitySearched = false; // Explicitly set to false at start
+    horlogeContainer.style.display = 'none';
+    isCitySearched = false;
 
     // Initial call to updateClock to set hands to 12:00 and digital display to --:--
-    updateClock(); // This will use the default isCitySearched=false logic
-
-    // Set the interval to keep the clock running.
-    // TEMPORARY: Set to 100ms for rapid visual feedback. Change back to 1000ms later.
+    updateClock();
     setInterval(updateClock, 1000);
 });
