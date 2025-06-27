@@ -206,38 +206,6 @@ body {
     box-shadow: inset -7px -7px 15px rgba(0,0,0,0.3);
 }
 
-/* ***** REMOVE THE @keyframes RULES BELOW THIS LINE *****
-   They are no longer needed as JavaScript now directly controls the transform.
-   Keeping them would create a conflict.
-*/
-/*
-@keyframes orbitSun {
-    0% {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
-    }
-    100% {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-360deg) translateX(180px) rotate(360deg);
-    }
-}
-
-@keyframes orbitMoon {
-    0% {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(180deg) translateX(180px) rotate(-180deg);
-    }
-    100% {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-180deg) translateX(180px) rotate(180deg);
-    }
-}
-*/
-
 /* --- Text Elements (Adjusted Spacing) --- */
 #ville, #heure {
     font-size: 2.2em;

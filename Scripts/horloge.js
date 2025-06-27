@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const moon = document.getElementById('moon');
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
+    const body = document.body;
 
     // ------------------- Global Variables for Time and Location -------------------
     let currentCity = "Nom de ville";
@@ -96,11 +97,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
         // ------------------- Day/Night Background Color Change -------------------
         if (isCitySearched) { // Change background based on local time if a city is searched
             let r, g, b;
+
             // Define colors for day and night transitions
             const dayColor = { r: 52, g: 73, b: 94 }; // Dark Blueish (early morning)
-            const midDayColor = { r: 255, g: 255, b: 255 }; // Whiteish (mid-day peak)
+            const midDayColor = { r: 135, g: 206, b: 235 }; // sky blue (mid-day peak)
             const eveningColor = { r: 255, g: 140, b: 0 }; // Dark Orange (sunset)
-            const nightColor = { r: 44, g: 62, b: 80 }; // Very dark blueish (deep night)
+            const nightColor = { r: 22, g: 31, b: 40 }; // Very dark blueish (deep night)
+
+            // Assuming localHours and localMinutes are already defined, for example:
+            // const now = new Date();
+            // const localHours = now.getHours();
+            // const localMinutes = now.getMinutes();
 
             if (localHours >= 6 && localHours < 12) { // Morning: Dark blueish to Whiteish (6 AM to 12 PM)
                 const progress = (localHours - 6 + localMinutes / 60) / 6; // 0 to 1 over 6 hours
@@ -118,20 +125,24 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 g = eveningColor.g + (nightColor.g - eveningColor.g) * progress;
                 b = eveningColor.b + (nightColor.b - eveningColor.b) * progress;
             } else { // Night/Early Morning: Dark Blue to Dark Blueish (12 AM to 6 AM)
+                // The previous progress calculation for this block was a bit off if it's meant to transition from nightColor to dayColor.
+                // It should cover the 0-6 hour range.
                 const progress = (localHours + localMinutes / 60) / 6; // 0 to 1 over 6 hours
                 r = nightColor.r + (dayColor.r - nightColor.r) * progress;
                 g = nightColor.g + (dayColor.g - nightColor.g) * progress;
                 b = nightColor.b + (dayColor.b - nightColor.b) * progress;
             }
 
-            // Ensure values are within 0-255 range and apply
-            r = Math.min(255, Math.max(0, r));
-            g = Math.min(255, Math.max(0, g));
-            b = Math.min(255, Math.max(0, b));
-            horlogeBG.style.backgroundColor = `rgba(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)}, 0.1)`;
+            // ROUND THE VALUES TO INTEGERS
+            r = Math.round(r);
+            g = Math.round(g);
+            b = Math.round(b);
+
+            // Apply the calculated RGB color to the body
+            document.body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
         } else {
             // Keep a default background color when no city is searched
-            horlogeBG.style.backgroundColor = `rgba(255, 255, 255, 0.1)`;
+            horlogeBG.style.background = `rgba(255, 255, 255, 0.1)`;
         }
     }
 
@@ -158,7 +169,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             "los angeles": -7,
             "sydney": 10,
             "dubai": 4,
-            "delhi": 5.5
+            "delhi": 5.5 // a modifier la facon de calculer le decalage
         };
 
         const lowerCaseCity = city.toLowerCase();
