@@ -54,7 +54,7 @@ body {
     border-radius: 5px;
     background-color: #3498db;
     color: white;
-    font-size: 1.1em;
+    font-size: 200%;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
@@ -186,27 +186,27 @@ body {
 }
 
 #aigHr {
-    width: 7px; /* Make it a thin vertical rectangle */
-    height: 25%; /* Length of the hour hand relative to #horlogeBG height */
+    width: 7px;
+    height: 25%;
     background-color: #f39c12;
-    z-index: 7; /* Hour hand is usually behind minute but above background */
-    /* NO 'transform' property here, JavaScript will set it dynamically */
+    z-index: 7;
+    border: 1px solid rgb(205, 130, 0);
 }
 
 #aigMin {
-    width: 6px; /* Make it a thin vertical rectangle */
-    height: 35%; /* Length of the minute hand */
-    background-color: #bdc3c7;
-    z-index: 8; /* Minute hand is usually above hour */
-    /* NO 'transform' property here, JavaScript will set it dynamically */
+    width: 6px;
+    height: 35%;
+    background-color: #6f7477;
+    z-index: 8;
+    border: 1px solid black;
 }
 
 #aigSec {
-    width: 3px; /* Make it a thin vertical rectangle */
-    height: 40%; /* Length of the second hand */
+    width: 3px;
+    height: 40%;
     background-color: #e74c3c;
-    z-index: 9; /* Second hand is usually on top */
-    /* NO 'transform' property here, JavaScript will set it dynamically */
+    z-index: 9;
+    border: 1px solid darkred;
 }
 
 /* --- Sun and Moon (Adjusted Size) --- */
