@@ -4,70 +4,100 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background-color: #2c3e50;
+    background-color: #2c3e50; /* This will be overridden by JS for initial state to black */
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ecf0f1;
     overflow: hidden;
+    /* REMOVE box-sizing: border-box; if you added it universally here */
 }
 
 /* --- Search Bar --- */
 #search-bar-container {
-    position: absolute; /* Position relative to the body */
-    top: 20px; /* Distance from the top edge */
-    left: 20px; /* Distance from the left edge */
-    z-index: 100; /* Ensure it's on top of all other content */
-    display: flex; /* Use flexbox to align input and button */
-    gap: 8px; /* Space between the input and button */
-    padding: 10px; /* Padding around the container for a subtle box */
-    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker background for visibility */
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 #search-input {
     padding: 10px 15px;
     border: 2px solid #555;
     border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.15); /* Slightly less transparent */
+    background-color: rgba(255, 255, 255, 0.15);
     color: #ecf0f1;
-    font-size: 1.1em; /* Slightly larger font */
-    outline: none; /* Remove default focus outline */
-    width: 220px; /* Adjust width as needed */
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2); /* Inner shadow for depth */
+    font-size: 1.1em;
+    outline: none;
+    width: 220px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    /* NO box-sizing here for now */
 }
 
 #search-input::placeholder {
-    color: rgba(236, 240, 241, 0.6); /* Lighter placeholder text */
+    color: rgba(236, 240, 241, 0.6);
 }
 
 #search-input:focus {
-    border-color: #3498db; /* Highlight border on focus */
+    border-color: #3498db;
     background-color: rgba(255, 255, 255, 0.2);
 }
 
 #search-button {
-    padding: 10px 18px; /* Adjusted padding for button */
+    padding: 10px 18px;
     border: none;
     border-radius: 5px;
-    background-color: #3498db; /* A nice blue */
+    background-color: #3498db;
     color: white;
-    font-size: 1.1em; /* Matches input font size */
+    font-size: 1.1em;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
 #search-button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    transform: translateY(-1px); /* Slight lift on hover */
+    background-color: #2980b9;
+    transform: translateY(-1px);
 }
 
 #search-button:active {
-    background-color: #2073aa; /* Even darker on click */
+    background-color: #2073aa;
     transform: translateY(0);
 }
 
+/* Add or ensure these styles for the custom autocomplete div are present */
+.autocomplete-suggestions {
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    /* KEY CHANGE: We will position this relative to its parent (#search-bar-container) */
+    position: absolute; 
+    width: calc(100% - 20px); /* Adjust to match input width + padding of container */
+    background-color: #333;
+    color: #eee;
+    z-index: 100;
+    display: none; /* Hide by default */
+    border-top: none;
+    border-radius: 0 0 5px 5px; /* Rounded bottom corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* NEW: Position it directly below the search input */
+    top: calc(100% + 8px); /* 100% of parent height + gap. Adjust if needed. */
+    left: 10px; /* Aligns with the inner content of #search-bar-container due to its 10px padding */
+}
+
+.autocomplete-suggestion-item {
+    padding: 8px 15px; /* Match input padding for consistency */
+    cursor: pointer;
+}
+
+.autocomplete-suggestion-item:hover {
+    background-color: #555;
+}
 
 /* --- Clock Container and Background Blur (Adjusted Size) --- */
 #horloge {
@@ -183,10 +213,10 @@ body {
 #sun, #moon {
     position: absolute;
     /* ***** MODIFICATIONS START HERE ***** */
-    top: 50%;           /* Essential: Place top edge at vertical center */
-    left: 50%;          /* Essential: Place left edge at horizontal center */
-    width: 60px;        /* Keeping your custom size */
-    height: 60px;       /* Keeping your custom size */
+    top: 50%;            /* Essential: Place top edge at vertical center */
+    left: 50%;           /* Essential: Place left edge at horizontal center */
+    width: 60px;         /* Keeping your custom size */
+    height: 60px;        /* Keeping your custom size */
     border-radius: 50%;
     z-index: 5;
     /* REMOVE CSS ANIMATIONS - JAVASCRIPT HANDLES POSITIONING */
