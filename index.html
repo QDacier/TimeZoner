@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>TimeZoner</title>
         <link rel="stylesheet" type="text/css" href="Styles/index.css">
-        <script type="module" src="Scripts/Countries.js"></script>
         <script src="Scripts/horloge.js"></script>
     </head>
     <body>
@@ -14,7 +13,8 @@
             <button id="search-button">🕘</button>
             <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div> 
         </div>
-        <p id="ville">ville</p>
+        <div id="main-content-wrapper">
+            <p id="ville">ville</p>
         <div id="horloge">
             <div id="sun"></div>
             <div id="moon"></div>
@@ -41,5 +41,9 @@
             </div>
         </div>
         <p id="heure">--:--</p>
+        </div>
+        <footer>
+            <p>&copy;TimeZoner / Go see my other stuff on GitHub</p>
+        </footer>
     </body>
 </html>
