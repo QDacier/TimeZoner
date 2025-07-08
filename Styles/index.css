@@ -11,7 +11,7 @@ body {
     overflow-x: hidden; /* Prevent horizontal scrollbar */
     overflow-y: auto; /* IMPORTANT: Allow vertical scrolling */
     position: relative; /* Crucial for absolute positioning of search bar */
-    padding-bottom: 5px; /* Added back a small padding to ensure footer content is fully visible */
+    padding-bottom: 5px; /* Added back a small padding to ensure footer content is fully fully visible */
 }
 
 /* --- Search Bar (remains absolute) --- */
@@ -102,14 +102,27 @@ body {
     background-color: #555;
 }
 
+/* --- Main Content Wrapper (HTML addition needed) --- */
+#main-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centers content vertically within its growing space */
+    flex-grow: 1; /* This wrapper will take up all available space */
+    width: 100%; /* Ensure it spans the width for alignment */
+    padding-top: 100px; /* Adjust this to push content down past the search bar for larger screens */
+    box-sizing: border-box; /* Include padding in total height */
+}
+
 /* --- City Name --- */
 #ville {
     font-size: 2.2em;
     font-weight: bold;
     text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
     z-index: 20;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    /* Reverted: Default margins can be used here for larger screens */
+    /* margin-top: 0px; */
+    /* margin-bottom: 0px; */
     text-align: center;
     width: 80%;
     min-width: 250px;
@@ -123,14 +136,15 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    /* Reverted: Default margins can be used here for larger screens */
+    /* margin-top: 0px; */
+    /* margin-bottom: 0px; */
     display: none; /* Hidden by default, shown on city search */
 
     transform: scale(var(--clock-scale, 1));
     transform-origin: center center;
 
-    --clock-scale: 1;
+    --clock-scale: 1; /* Default scale for larger screens */
 }
 
 #horlogeBG {
@@ -254,12 +268,12 @@ body {
     font-weight: bold;
     text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
     z-index: 20;
-    margin-top: 0px;
-    margin-bottom: 0px;
+    /* Reverted: Default margins can be used here for larger screens */
+    /* margin-top: 0px; */
+    /* margin-bottom: 0px; */
 }
 
 /* --- Responsive Scaling for the Clock (General Media Queries) --- */
-/* These scales apply regardless of the specific 1920px width */
 @media (max-height: 700px) {
     #horloge {
         --clock-scale: 0.8;
@@ -308,56 +322,51 @@ body {
     }
 }
 
-
 /* ###################################################################### */
 /* ------------------------------ Portables ------------------------------ */
 /* ###################################################################### */
-@media (max-width: 1919px) {
+@media (max-width: 1100px) {
 
-    /* --- Main Content Wrapper (HTML addition needed) --- */
-#main-content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center; /* Centers content vertically within its growing space */
-    flex-grow: 1; /* This wrapper will take up all available space */
-    width: 100%; /* Ensure it spans the width for alignment */
-    padding-top: 100px; /* Adjust this to push content down past the search bar */
-    box-sizing: border-box; /* Include padding in total height */
-}
-
-    /* Example 1: Reduce clock scale slightly if it's currently at full size */
-    #horloge {
-        --clock-scale: 0.9; /* Scale to 90% when width is less than 1920px */
+    /* --- Main Content Wrapper Adjustments for Smaller Screens --- */
+    #main-content-wrapper {
+        padding-top: 50px;
+        padding-bottom: 50px;
     }
 
-    /* Example 2: Slightly reduce font sizes for better fit */
+    /* --- Clock Scale Adjustment for "Portables" --- */
+    #horloge {
+        --clock-scale: 0.7; /* Scale the entire clock (and its children) to 70% */
+        margin-top: 0px;    /* Stick to previous element */
+        margin-bottom: 0px; /* Stick to next element */
+    }
+
+    /* --- Adjustments for City Name on Portables --- */
     #ville {
         font-size: 2em;
+        margin-top: 0px;
+        margin-bottom: 0px; 
     }
+
+    /* --- Adjustments for Digital Time Display on Portables --- */
     #heure {
         font-size: 2em;
+        margin-top: 0px;
+        margin-bottom: 0px;
     }
 
-    /* Example 3: Adjust padding on main content wrapper */
-    #main-content-wrapper {
-        padding-top: 80px; /* Reduce top padding if the search bar is also smaller */
-    }
-
-    /* Example 4: Adjust search bar position or size */
+    /* Example: Adjust search bar position or size */
     #search-bar-container {
-        top: 15px; /* Move search bar up slightly */
+        top: 15px;
         left: 15px;
     }
     #search-input {
-        width: 200px; /* Make search input slightly narrower */
+        width: 200px;
         font-size: 1em;
     }
 }
 
-
 /* --- FOOTER STYLES --- */
-footer {
+footer { /* Assuming your HTML now uses <footer id="footer"> or just <footer> */
     width: 100%;
     padding: 20px 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
