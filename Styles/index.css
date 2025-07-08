@@ -1,18 +1,20 @@
 body {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #2c3e50; /* This will be overridden by JS for initial state to black */
+    flex-direction: column; /* Stacks children vertically */
+    justify-content: flex-start; /* Aligns content from the start */
+    align-items: center; /* Centers content horizontally */
+    min-height: 100vh; /* Ensures body takes full viewport height */
+    background-color: #2c3e50;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ecf0f1;
-    overflow: hidden;
-    /* REMOVE box-sizing: border-box; if you added it universally here */
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    overflow-y: auto; /* IMPORTANT: Allow vertical scrolling */
+    position: relative; /* Crucial for absolute positioning of search bar */
+    padding-bottom: 5px; /* Added back a small padding to ensure footer content is fully visible */
 }
 
-/* --- Search Bar --- */
+/* --- Search Bar (remains absolute) --- */
 #search-bar-container {
     position: absolute;
     top: 20px;
@@ -36,7 +38,6 @@ body {
     outline: none;
     width: 220px;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-    /* NO box-sizing here for now */
 }
 
 #search-input::placeholder {
@@ -70,28 +71,30 @@ body {
     transform: translateY(0);
 }
 
-/* Add or ensure these styles for the custom autocomplete div are present */
 .autocomplete-suggestions {
     border: 1px solid #ccc;
     max-height: 200px;
     overflow-y: auto;
-    /* KEY CHANGE: We will position this relative to its parent (#search-bar-container) */
-    position: absolute; 
-    width: calc(100% - 20px); /* Adjust to match input width + padding of container */
+    position: absolute;
+    width: calc(100% - 20px);
     background-color: #333;
     color: #eee;
     z-index: 100;
-    display: none; /* Hide by default */
+    display: none;
     border-top: none;
-    border-radius: 0 0 5px 5px; /* Rounded bottom corners */
+    border-radius: 0 0 5px 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    /* NEW: Position it directly below the search input */
-    top: calc(100% + 8px); /* 100% of parent height + gap. Adjust if needed. */
-    left: 10px; /* Aligns with the inner content of #search-bar-container due to its 10px padding */
+    top: calc(100% + 8px);
+    left: 10px;
+}
+
+.autocomplete-suggestion-item.selected-suggestion {
+    background-color: #3f51b5;
+    color: white;
 }
 
 .autocomplete-suggestion-item {
-    padding: 8px 15px; /* Match input padding for consistency */
+    padding: 8px 15px;
     cursor: pointer;
 }
 
@@ -99,7 +102,20 @@ body {
     background-color: #555;
 }
 
-/* --- Clock Container and Background Blur (Adjusted Size) --- */
+/* --- City Name --- */
+#ville {
+    font-size: 2.2em;
+    font-weight: bold;
+    text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
+    z-index: 20;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    text-align: center;
+    width: 80%;
+    min-width: 250px;
+}
+
+/* --- Clock Container (MAIN SCALING ELEMENT) --- */
 #horloge {
     position: relative;
     width: 450px;
@@ -107,9 +123,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 20px; /* Reduced from 30px */
-    margin-bottom: 20px; /* Reduced from 30px */
+    margin-top: 0px;
+    margin-bottom: 0px;
     display: none; /* Hidden by default, shown on city search */
+
+    transform: scale(var(--clock-scale, 1));
+    transform-origin: center center;
+
+    --clock-scale: 1;
 }
 
 #horlogeBG {
@@ -117,7 +138,7 @@ body {
     height: 300px;
     border: 8px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    position: relative; /* Crucial for positioning hands */
+    position: relative;
     background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 45px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(12px);
@@ -129,37 +150,31 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* This container pivots from its top-left corner (which is at the clock's center) */
     transform-origin: 0 0;
-    /* Rotate the container using the custom property defined in HTML */
     transform: rotate(var(--rotation));
-    z-index: 6; /* Placed below clock hands, above clock background */
+    z-index: 6;
 }
 
-/* Common positioning for the actual number/line elements inside their rotated containers */
 .hour-number, .hour-line {
-    position: absolute; /* Position relative to their rotated container */
-    left: 0; /* Align left edge with the container's vertical axis */
-    /* transform property will be set individually for numbers/lines */
+    position: absolute;
+    left: 0;
 }
 
 .hour-number {
     font-size: 1.8em;
     font-weight: bold;
     color: #ecf0f1;
-    /* NEW: Adjust top to move numbers closer to the border */
-    top: -155px; /* Changed from -120px to -140px. Adjust further if needed. */
-    /* NEW: Counter-rotate the number to keep it upright */
+    top: -155px;
     transform: translateX(-50%) rotate(calc(-1 * var(--rotation)));
 }
 
 .hour-line {
-    width: 3px; /* Thickness of the line */
-    height: 10px; /* Length of the line */
+    width: 3px;
+    height: 10px;
     background-color: #ecf0f1;
     border-radius: 2px;
-    top: -140px; /* Lines will also be closer to the border, adjust if different */
-    transform: translateX(-50%); /* Lines still rotate with the clock face */
+    top: -140px;
+    transform: translateX(-50%);
 }
 
 /* --- Clock Hands (Aiguilles) --- */
@@ -171,18 +186,17 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Centers the dot */
+    transform: translate(-50%, -50%);
     z-index: 10;
 }
 
 .aiguille {
     position: absolute;
     background-color: #ecf0f1;
-    top: 50%; /* Position the element's top edge at the clock's vertical center */
-    left: 50%; /* Position the element's left edge at the clock's horizontal center */
-    transform-origin: 50% 100%; /* Keep this, it sets the pivot point correctly at the bottom-center of the hand */
+    top: 50%;
+    left: 50%;
+    transform-origin: 50% 100%;
     border-radius: 3px;
-    /* z-index is set below for specific hands */
 }
 
 #aigHr {
@@ -209,19 +223,17 @@ body {
     border: 1px solid darkred;
 }
 
-/* --- Sun and Moon (Adjusted Size) --- */
+/* --- Sun and Moon --- */
 #sun, #moon {
     position: absolute;
-    /* ***** MODIFICATIONS START HERE ***** */
-    top: 50%;            /* Essential: Place top edge at vertical center */
-    left: 50%;           /* Essential: Place left edge at horizontal center */
-    width: 60px;         /* Keeping your custom size */
-    height: 60px;        /* Keeping your custom size */
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     z-index: 5;
-    /* REMOVE CSS ANIMATIONS - JAVASCRIPT HANDLES POSITIONING */
-    animation: none; /* Explicitly turn off any conflicting animations */
-    transition: transform 0.1s linear; /* Keep this for smooth JS updates */
+    animation: none;
+    transition: transform 0.1s linear;
 }
 
 #sun {
@@ -230,24 +242,147 @@ body {
 }
 
 #moon {
-    width: 50px; /* Keeping your custom size for moon */
-    height: 50px; /* Keeping your custom size for moon */
+    width: 50px;
+    height: 50px;
     background: radial-gradient(circle at 30% 30%, #ecf0f1, #bdc3c7);
     box-shadow: inset -7px -7px 15px rgba(0,0,0,0.3);
 }
 
-/* --- Text Elements (Adjusted Spacing) --- */
-#ville, #heure {
+/* --- Digital Time Display --- */
+#heure {
     font-size: 2.2em;
     font-weight: bold;
     text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
     z-index: 20;
+    margin-top: 0px;
+    margin-bottom: 0px;
 }
 
-#ville {
-    margin-bottom: 10px; /* Reduced from 15px */
+/* --- Responsive Scaling for the Clock (General Media Queries) --- */
+/* These scales apply regardless of the specific 1920px width */
+@media (max-height: 700px) {
+    #horloge {
+        --clock-scale: 0.8;
+    }
 }
 
-#heure {
-    margin-top: 10px; /* Reduced from 15px */
+@media (max-height: 600px) {
+    #horloge {
+        --clock-scale: 0.7;
+    }
+}
+
+@media (max-height: 500px) {
+    #horloge {
+        --clock-scale: 0.6;
+    }
+}
+
+@media (max-width: 550px) {
+    #horloge {
+        --clock-scale: 0.7;
+    }
+}
+
+@media (max-width: 550px) and (max-height: 700px) {
+    #horloge {
+        --clock-scale: 0.6;
+    }
+}
+
+@media (max-width: 480px) or (max-height: 550px) {
+    #horloge {
+        --clock-scale: 0.5;
+    }
+    #ville {
+        font-size: 1.8em;
+    }
+    #heure {
+        font-size: 1.8em;
+    }
+}
+
+@media (min-width: 1000px) and (min-height: 750px) {
+    #horloge {
+        --clock-scale: 1;
+    }
+}
+
+
+/* ###################################################################### */
+/* ------------------------------ Portables ------------------------------ */
+/* ###################################################################### */
+@media (max-width: 1919px) {
+
+    /* --- Main Content Wrapper (HTML addition needed) --- */
+#main-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Centers content vertically within its growing space */
+    flex-grow: 1; /* This wrapper will take up all available space */
+    width: 100%; /* Ensure it spans the width for alignment */
+    padding-top: 100px; /* Adjust this to push content down past the search bar */
+    box-sizing: border-box; /* Include padding in total height */
+}
+
+    /* Example 1: Reduce clock scale slightly if it's currently at full size */
+    #horloge {
+        --clock-scale: 0.9; /* Scale to 90% when width is less than 1920px */
+    }
+
+    /* Example 2: Slightly reduce font sizes for better fit */
+    #ville {
+        font-size: 2em;
+    }
+    #heure {
+        font-size: 2em;
+    }
+
+    /* Example 3: Adjust padding on main content wrapper */
+    #main-content-wrapper {
+        padding-top: 80px; /* Reduce top padding if the search bar is also smaller */
+    }
+
+    /* Example 4: Adjust search bar position or size */
+    #search-bar-container {
+        top: 15px; /* Move search bar up slightly */
+        left: 15px;
+    }
+    #search-input {
+        width: 200px; /* Make search input slightly narrower */
+        font-size: 1em;
+    }
+}
+
+
+/* --- FOOTER STYLES --- */
+footer {
+    width: 100%;
+    padding: 20px 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
+    color: #aeb6bf;
+    text-align: center;
+    font-size: 0.9em;
+    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 50;
+
+    margin-top: auto; /* This pushes the footer to the bottom */
+}
+
+footer p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+footer a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #2980b9;
 }
