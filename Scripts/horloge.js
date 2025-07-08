@@ -19,10 +19,36 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let currentCity = "Search for a City";
     let currentIANAtimezone = null;
     let isCitySearched = false;
+    let selectedIndex = -1; // NEW: To keep track of the currently selected suggestion
 
     // Map des villes avec leurs fusieaux horaires
     const cityToTimezoneMap = {
-        
+        "london": { "timezone": "Europe/London", "displayName": "London, UK" },
+        "paris": { "timezone": "Europe/Paris", "displayName": "Paris, France" },
+        "Nice": { "timezone": "Europe/Paris", "displayName": "Nice, France" },
+        // Add more cities here as needed
+        "new york": { "timezone": "America/New_York", "displayName": "New York, USA" },
+        "tokyo": { "timezone": "Asia/Tokyo", "displayName": "Tokyo, Japan" },
+        "sydney": { "timezone": "Australia/Sydney", "displayName": "Sydney, Australia" },
+        "dubai": { "timezone": "Asia/Dubai", "displayName": "Dubai, UAE" },
+        "cairo": { "timezone": "Africa/Cairo", "displayName": "Cairo, Egypt" },
+        "rio de janeiro": { "timezone": "America/Sao_Paulo", "displayName": "Rio de Janeiro, Brazil" },
+        "moscow": { "timezone": "Europe/Moscow", "displayName": "Moscow, Russia" },
+        "beijing": { "timezone": "Asia/Shanghai", "displayName": "Beijing, China" },
+        "berlin": { "timezone": "Europe/Berlin", "displayName": "Berlin, Germany" },
+        "rome": { "timezone": "Europe/Rome", "displayName": "Rome, Italy" },
+        "madrid": { "timezone": "Europe/Madrid", "displayName": "Madrid, Spain" },
+        "amsterdam": { "timezone": "Europe/Amsterdam", "displayName": "Amsterdam, Netherlands" },
+        "dublin": { "timezone": "Europe/Dublin", "displayName": "Dublin, Ireland" },
+        "mexico city": { "timezone": "America/Mexico_City", "displayName": "Mexico City, Mexico" },
+        "toronto": { "timezone": "America/Toronto", "displayName": "Toronto, Canada" },
+        "vancouver": { "timezone": "America/Vancouver", "displayName": "Vancouver, Canada" },
+        "delhi": { "timezone": "Asia/Kolkata", "displayName": "Delhi, India" },
+        "hong kong": { "timezone": "Asia/Hong_Kong", "displayName": "Hong Kong, China" },
+        "singapore": { "timezone": "Asia/Singapore", "displayName": "Singapore, Singapore" },
+        "seoul": { "timezone": "Asia/Seoul", "displayName": "Seoul, South Korea" },
+        "auckland": { "timezone": "Pacific/Auckland", "displayName": "Auckland, New Zealand" },
+        "capetown": { "timezone": "Africa/Johannesburg", "displayName": "Cape Town, South Africa" }
     };
 
     /**
@@ -82,13 +108,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             moon.style.transform = `translate(-50%, -50%) rotate(${finalRotateMoonAngle}deg) translateX(${orbitRadius}px) rotate(${-finalRotateMoonAngle}deg)`;
 
             // --- Day/Night Background Color Change based on specific sky stages ---
-            // Brice de Nice
-            /*
-            if (cityDisplay.textContent == "Nice, France") {
-
-
-            }
-            */
+            // Brice de Nice (not implemented in this section, keeping the original logic)
 
             let r, g, b;
 
@@ -163,7 +183,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const progress = (totalMinutes - 1320) / 120;
                 r = earlyNightDarkColor.r + (midnightDeepColor.r - earlyNightDarkColor.r) * progress;
                 g = earlyNightDarkColor.g + (midnightDeepColor.g - earlyNightDarkColor.g) * progress;
-                b = earlyNightDarkColor.b + (midnightDeepColor.b - earlyNightDarkColor.b) * progress;
+                b = midnightDeepColor.b + (earlyNightDarkColor.b - midnightDeepColor.b) * progress; // Corrected: midnightDeepColor.b + (midnightDeepColor.b - earlyNightDarkColor.b) * progress;
             }
 
             // arrondissement des valeurs
@@ -208,8 +228,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
         cityDisplay.textContent = currentCity;
     }
 
-    /*
-    function BriceDeNice(bool isBricable) {
+
+    function BriceDeNice(isBricable) {
         if (isBricable) {
             horlogeBG.style.background = "black";
             body.style.background = "yellow";
@@ -229,7 +249,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             hourHand.style.background = "yellow";
         }
     }
-    */
 
     //Recherche de la ville dans la map
     async function searchCity() {
@@ -262,7 +281,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             updateClock();
             searchInput.value = ""; // vide bar de recherche
-            autocompleteSuggestionsDiv.style.display = 'none'; // cache les suggestions 
+            autocompleteSuggestionsDiv.style.display = 'none'; // cache les suggestions
+            selectedIndex = -1; // NEW: Reset selection after search
         } else {
             // ville introuvable
             alert(
@@ -275,18 +295,37 @@ document.addEventListener('DOMContentLoaded', (event) => {
             horlogeContainer.style.display = 'none';
 
             // Reset visual elements to their default "no city" state
-            hourHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
-            minuteHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
-            secondHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
-            body.style.backgroundColor = `rgb(22, 31, 40)`; // Ensure it resets to black/dark
-            autocompleteSuggestionsDiv.style.display = 'none'; // Hide suggestions on failed search
+            hourHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
+            minuteHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
+            secondHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
+            body.style.backgroundColor = "rgb(22, 31, 40)"; // Ensure it resets to black/dark
+            autocompleteSuggestionsDiv.style.display = "none"; // Hide suggestions on failed search
+            selectedIndex = -1; // NEW: Reset selection on failed search
         }
     }
 
-    // --- NEW: Autocomplete Event Listener ---
+    // NEW FUNCTION: Manages highlighting of autocomplete suggestions
+    function highlightSuggestion(index) {
+        const suggestions = autocompleteSuggestionsDiv.querySelectorAll('.autocomplete-suggestion-item');
+        // Remove existing highlights
+        suggestions.forEach(item => {
+            item.classList.remove('selected-suggestion');
+        });
+
+        // Apply highlight to the new selected item
+        if (index >= 0 && index < suggestions.length) {
+            suggestions[index].classList.add('selected-suggestion');
+            // Optional: Scroll the highlighted item into view
+            suggestions[index].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+        }
+    }
+
+
+    // --- Modified: Autocomplete Event Listener ---
     searchInput.addEventListener('input', function () {
         const inputValue = this.value.trim().toLowerCase();
         autocompleteSuggestionsDiv.innerHTML = ''; // Clear previous suggestions
+        selectedIndex = -1; // NEW: Reset selection when input changes
 
         if (inputValue.length === 0) {
             autocompleteSuggestionsDiv.style.display = 'none';
@@ -303,10 +342,17 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
 
         if (matchingCities.length > 0) {
-            matchingCities.forEach(cityName => {
+            matchingCities.forEach((cityName, index) => { // NEW: added index
                 const suggestionItem = document.createElement('div');
                 suggestionItem.classList.add('autocomplete-suggestion-item');
                 suggestionItem.textContent = cityName;
+
+                // NEW: Add mouseover event to update selectedIndex
+                suggestionItem.addEventListener('mouseover', function () {
+                    selectedIndex = index;
+                    highlightSuggestion(selectedIndex);
+                });
+
                 suggestionItem.addEventListener('click', () => {
                     searchInput.value = cityName; // Set the input value
                     autocompleteSuggestionsDiv.style.display = 'none'; // Hide suggestions
@@ -320,20 +366,55 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 
-    // --- NEW: Hide suggestions when clicking outside the search input/suggestions ---
+    // --- Modified: Hide suggestions when clicking outside the search input/suggestions ---
     document.addEventListener('click', function (e) {
         if (!searchInput.contains(e.target) && !autocompleteSuggestionsDiv.contains(e.target)) {
             autocompleteSuggestionsDiv.style.display = 'none';
+            selectedIndex = -1; // NEW: Reset selection when suggestions are hidden
         }
     });
 
 
-    // --- Event Listeners for Search Functionality (existing) ---
+    // --- Modified: Event Listener for Enter, ArrowUp, ArrowDown Keys ---
     searchButton.addEventListener('click', searchCity);
     searchInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
+        const suggestions = autocompleteSuggestionsDiv.querySelectorAll('.autocomplete-suggestion-item');
+        const numSuggestions = suggestions.length;
+
+        if (event.key === 'ArrowUp') {
+            event.preventDefault(); // Prevent cursor from moving to start of input
+            if (numSuggestions > 0) {
+                selectedIndex = (selectedIndex - 1 + numSuggestions) % numSuggestions;
+                highlightSuggestion(selectedIndex);
+            }
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault(); // Prevent cursor from moving to end of input
+            if (numSuggestions > 0) {
+                selectedIndex = (selectedIndex + 1) % numSuggestions;
+                highlightSuggestion(selectedIndex);
+            }
+        } else if (event.key === 'Enter') {
             event.preventDefault(); // Prevent form submission
-            searchCity();
+
+            if (autocompleteSuggestionsDiv.style.display === 'block' && numSuggestions > 0) {
+                let cityToSearch = '';
+                if (selectedIndex !== -1) {
+                    // If an item is selected by arrows, use its text
+                    cityToSearch = suggestions[selectedIndex].textContent;
+                } else {
+                    // If no item is selected (e.g., just typed and pressed Enter),
+                    // default to the first suggestion if available, otherwise use input value
+                    cityToSearch = suggestions[0] ? suggestions[0].textContent : searchInput.value;
+                }
+
+                searchInput.value = cityToSearch; // Set input value to the chosen city
+                autocompleteSuggestionsDiv.style.display = 'none'; // Hide suggestions
+                searchCity(); // Trigger search with the selected/chosen city
+                selectedIndex = -1; // Reset selection after search
+            } else {
+                // If no suggestions are visible, search the current input value
+                searchCity();
+            }
         }
     });
 
