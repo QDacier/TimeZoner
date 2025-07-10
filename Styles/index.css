@@ -14,7 +14,7 @@ body {
     padding-bottom: 5px; /* Added back a small padding to ensure footer content is fully fully visible */
 }
 
-/* --- Search Bar (remains absolute) --- */
+/* --- Search Bar Container (always visible, but its children hide/show) --- */
 #search-bar-container {
     position: absolute;
     top: 20px;
@@ -26,18 +26,27 @@ body {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, padding 0.3s ease; /* Example */
 }
 
+/* --- Search Input (Hidden by default, using max-width for collapse animation) --- */
 #search-input {
-    padding: 10px 15px;
-    border: 2px solid #555;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.15);
+    min-width: 0; /* Allows shrinking below content size */
+    border: 2px solid transparent;
     color: #ecf0f1;
     font-size: 1.1em;
     outline: none;
-    width: 220px;
+    background-color: rgba(255, 255, 255, 0.15);
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    box-sizing: border-box;
+
+    /* --- Key changes for "display: none" like behavior with animation --- */
+    max-width: 0; /* Start at 0 width, effectively hidden */
+    padding: 0 0px; /* Collapse padding when hidden */
+    opacity: 0; /* Fully transparent */
+    overflow: hidden; /* Hide any content that exceeds max-width */
+    pointer-events: none; /* Prevent interaction when hidden */
+    transition: max-width 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out 0.1s; /* Add transitions */
 }
 
 #search-input::placeholder {
@@ -49,6 +58,7 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* --- Search Button --- */
 #search-button {
     padding: 10px 18px;
     border: none;
@@ -71,22 +81,45 @@ body {
     transform: translateY(0);
 }
 
+/* --- Autocomplete Suggestions (Hidden by default, using max-height for collapse animation) --- */
 .autocomplete-suggestions {
     border: 1px solid #ccc;
-    max-height: 200px;
-    overflow-y: auto;
-    position: absolute;
-    width: calc(100% - 20px);
+    /* max-height for the reveal animation, start at 0 */
+    max-height: 0;
+    overflow: hidden; /* Hide content when collapsed */
+    opacity: 0; /* Fully transparent */
+    pointer-events: none; /* Prevent interaction when hidden */
+    position: absolute; /* Positions it below the search bar */
     background-color: #333;
     color: #eee;
-    z-index: 100;
-    display: none;
+    z-index: 100; /* Ensure it's above other content */
     border-top: none;
     border-radius: 0 0 5px 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    top: calc(100% + 8px);
+    top: calc(100% + 8px); /* Positions it below the search bar container */
     left: 10px;
+    /* Add transition for max-height and opacity */
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out 0.1s;
+    /* Note: padding on suggestions needs to be set when visible, not when hidden */
+    padding: 0; /* Start with no padding when collapsed */
 }
+
+
+/* --- Show input and autocomplete when the search-bar-container is hovered --- */
+#search-bar-container:hover #search-input {
+    max-width: 220px; /* Expand to its desired width */
+    padding: 10px 15px; /* Restore original padding for input */
+    opacity: 1; /* Fully visible */
+    pointer-events: auto; /* Allow interaction */
+}
+
+#search-bar-container:hover .autocomplete-suggestions {
+    max-height: 200px; /* Expand to allow content to show */
+    padding: 8px 15px; /* Restore original padding for suggestions */
+    opacity: 1; /* Fully visible */
+    pointer-events: auto; /* Allow interaction */
+}
+
 
 .autocomplete-suggestion-item.selected-suggestion {
     background-color: #3f51b5;
@@ -102,7 +135,7 @@ body {
     background-color: #555;
 }
 
-/* --- Main Content Wrapper (HTML addition needed) --- */
+/* --- Main Content Wrapper --- */
 #main-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -120,9 +153,6 @@ body {
     font-weight: bold;
     text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
     z-index: 20;
-    /* Reverted: Default margins can be used here for larger screens */
-    /* margin-top: 0px; */
-    /* margin-bottom: 0px; */
     text-align: center;
     width: 80%;
     min-width: 250px;
@@ -136,10 +166,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Reverted: Default margins can be used here for larger screens */
-    /* margin-top: 0px; */
-    /* margin-bottom: 0px; */
-    display: none; /* Hidden by default, shown on city search */
+    display: none; /* Hidden by default, shown on city search by JS */
 
     transform: scale(var(--clock-scale, 1));
     transform-origin: center center;
@@ -268,9 +295,6 @@ body {
     font-weight: bold;
     text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
     z-index: 20;
-    /* Reverted: Default margins can be used here for larger screens */
-    /* margin-top: 0px; */
-    /* margin-bottom: 0px; */
 }
 
 /* --- Responsive Scaling for the Clock (General Media Queries) --- */
@@ -344,7 +368,7 @@ body {
     #ville {
         font-size: 2em;
         margin-top: 0px;
-        margin-bottom: 0px; 
+        margin-bottom: 0px;
     }
 
     /* --- Adjustments for Digital Time Display on Portables --- */
@@ -354,19 +378,21 @@ body {
         margin-bottom: 0px;
     }
 
-    /* Example: Adjust search bar position or size */
+    /* Adjust search bar container position for smaller screens */
     #search-bar-container {
         top: 15px;
         left: 15px;
     }
-    #search-input {
-        width: 200px;
+
+    /* When container is hovered on smaller screens, expand input */
+    #search-bar-container:hover #search-input {
+        max-width: 200px; /* Adjusted initial width for smaller screens */
         font-size: 1em;
     }
 }
 
 /* --- FOOTER STYLES --- */
-footer { /* Assuming your HTML now uses <footer id="footer"> or just <footer> */
+footer {
     width: 100%;
     padding: 20px 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
@@ -377,8 +403,7 @@ footer { /* Assuming your HTML now uses <footer id="footer"> or just <footer> */
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     z-index: 50;
-
-    margin-top: auto; /* This pushes the footer to the bottom */
+    margin-top: auto;
 }
 
 footer p {
