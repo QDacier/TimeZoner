@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     const sun = document.getElementById('sun');
     const moon = document.getElementById('moon');
     const searchInput = document.getElementById('search-input');
-    const searchButton = document.getElementById('search-button');
     const body = document.body;
     const autocompleteSuggestionsDiv = document.getElementById('autocomplete-suggestions');
 
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let currentCity = "Search for a City";
     let currentIANAtimezone = null;
     let isCitySearched = false;
-    let selectedIndex = -1; // NEW: To keep track of the currently selected suggestion
+    let selectedIndex = -1; // To keep track of the currently selected suggestion
 
     // Map des villes avec leurs fusieaux horaires
     const cityToTimezoneMap = {
@@ -385,8 +384,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
             moon.style.transform = `translate(-50%, -50%) rotate(${finalRotateMoonAngle}deg) translateX(${orbitRadius}px) rotate(${-finalRotateMoonAngle}deg)`;
 
             // --- Day/Night Background Color Change based on specific sky stages ---
-            // Brice de Nice (not implemented in this section, keeping the original logic)
-
             let r, g, b;
 
             const midnightDeepColor = { r: 15, g: 15, b: 30 };    // Very deep indigo (00:00, 24:00)
@@ -460,7 +457,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 const progress = (totalMinutes - 1320) / 120;
                 r = earlyNightDarkColor.r + (midnightDeepColor.r - earlyNightDarkColor.r) * progress;
                 g = earlyNightDarkColor.g + (midnightDeepColor.g - earlyNightDarkColor.g) * progress;
-                b = midnightDeepColor.b + (earlyNightDarkColor.b - midnightDeepColor.b) * progress; // Corrected: midnightDeepColor.b + (midnightDeepColor.b - earlyNightDarkColor.b) * progress;
+                b = midnightDeepColor.b + (midnightDeepColor.b - earlyNightDarkColor.b) * progress;
             }
 
             // arrondissement des valeurs
@@ -558,8 +555,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             updateClock();
             searchInput.value = ""; // vide bar de recherche
-            autocompleteSuggestionsDiv.style.display = 'none'; // cache les suggestions
-            selectedIndex = -1; // NEW: Reset selection after search
+            autocompleteSuggestionsDiv.classList.remove('is-visible'); // Hide suggestions after search
+            autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions content
+            selectedIndex = -1; // Reset selection after search
         } else {
             // ville introuvable
             alert(
@@ -576,12 +574,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
             minuteHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
             secondHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
             body.style.backgroundColor = "rgb(22, 31, 40)"; // Ensure it resets to black/dark
-            autocompleteSuggestionsDiv.style.display = "none"; // Hide suggestions on failed search
-            selectedIndex = -1; // NEW: Reset selection on failed search
+            autocompleteSuggestionsDiv.classList.remove('is-visible'); // Hide suggestions on failed search
+            autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions content
+            selectedIndex = -1; // Reset selection on failed search
         }
     }
 
-    // NEW FUNCTION: Manages highlighting of autocomplete suggestions
+    /**
+     * Manages highlighting of autocomplete suggestions based on selectedIndex.
+     * @param {number} index - The index of the suggestion to highlight.
+     */
     function highlightSuggestion(index) {
         const suggestions = autocompleteSuggestionsDiv.querySelectorAll('.autocomplete-suggestion-item');
         // Remove existing highlights
@@ -597,15 +599,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
+    /**
+     * Toggles the visibility of autocomplete suggestions via the 'is-visible' CSS class.
+     * It ensures suggestions are only shown if there are matching results AND the input is not empty.
+     */
+    function toggleAutocompleteVisibility() {
+        // Check if there are actual suggestion elements AND the input field has text
+        if (autocompleteSuggestionsDiv.children.length > 0 && searchInput.value.trim().length > 0) {
+            autocompleteSuggestionsDiv.classList.add('is-visible');
+        } else {
+            autocompleteSuggestionsDiv.classList.remove('is-visible');
+            autocompleteSuggestionsDiv.innerHTML = ''; // Clear content when hidden
+            selectedIndex = -1; // Reset selection when hidden
+        }
+    }
 
-    // --- Modified: Autocomplete Event Listener ---
+
+    // --- Event Listener for search input (handles autocomplete generation) ---
     searchInput.addEventListener('input', function () {
         const inputValue = this.value.trim().toLowerCase();
         autocompleteSuggestionsDiv.innerHTML = ''; // Clear previous suggestions
-        selectedIndex = -1; // NEW: Reset selection when input changes
+        selectedIndex = -1; // Reset selection when input changes
 
         if (inputValue.length === 0) {
-            autocompleteSuggestionsDiv.style.display = 'none';
+            toggleAutocompleteVisibility(); // Hide suggestions if input is empty
             return;
         }
 
@@ -619,12 +636,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
 
         if (matchingCities.length > 0) {
-            matchingCities.forEach((cityName, index) => { // NEW: added index
+            matchingCities.forEach((cityName, index) => {
                 const suggestionItem = document.createElement('div');
                 suggestionItem.classList.add('autocomplete-suggestion-item');
                 suggestionItem.textContent = cityName;
 
-                // NEW: Add mouseover event to update selectedIndex
+                // Add mouseover event to update selectedIndex
                 suggestionItem.addEventListener('mouseover', function () {
                     selectedIndex = index;
                     highlightSuggestion(selectedIndex);
@@ -632,28 +649,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
                 suggestionItem.addEventListener('click', () => {
                     searchInput.value = cityName; // Set the input value
-                    autocompleteSuggestionsDiv.style.display = 'none'; // Hide suggestions
-                    searchCity(); // Trigger the search immediately
+                    searchCity(); // Trigger the search immediately (searchCity will handle hiding)
                 });
                 autocompleteSuggestionsDiv.appendChild(suggestionItem);
             });
-            autocompleteSuggestionsDiv.style.display = 'block'; // Show suggestions
+            toggleAutocompleteVisibility(); // Show suggestions if matches were found
         } else {
-            autocompleteSuggestionsDiv.style.display = 'none'; // Hide if no matches
+            toggleAutocompleteVisibility(); // Hide if no matches found
         }
     });
 
-    // --- Modified: Hide suggestions when clicking outside the search input/suggestions ---
+    // --- Hide suggestions when clicking outside the search input/suggestions ---
     document.addEventListener('click', function (e) {
         if (!searchInput.contains(e.target) && !autocompleteSuggestionsDiv.contains(e.target)) {
-            autocompleteSuggestionsDiv.style.display = 'none';
-            selectedIndex = -1; // NEW: Reset selection when suggestions are hidden
+            toggleAutocompleteVisibility(); // Hide using the toggle function
         }
     });
 
 
-    // --- Modified: Event Listener for Enter, ArrowUp, ArrowDown Keys ---
-    searchButton.addEventListener('click', searchCity);
+    // --- Event Listener for Keyboard (Enter, ArrowUp, ArrowDown) ---
     searchInput.addEventListener('keydown', (event) => {
         const suggestions = autocompleteSuggestionsDiv.querySelectorAll('.autocomplete-suggestion-item');
         const numSuggestions = suggestions.length;
@@ -671,37 +685,37 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 highlightSuggestion(selectedIndex);
             }
         } else if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent form submission
+            event.preventDefault(); // Prevent form submission (if input is inside a form)
 
-            if (autocompleteSuggestionsDiv.style.display === 'block' && numSuggestions > 0) {
+            // If autocomplete is visible and there are suggestions
+            if (autocompleteSuggestionsDiv.classList.contains('is-visible') && numSuggestions > 0) {
                 let cityToSearch = '';
                 if (selectedIndex !== -1) {
                     // If an item is selected by arrows, use its text
                     cityToSearch = suggestions[selectedIndex].textContent;
                 } else {
                     // If no item is selected (e.g., just typed and pressed Enter),
-                    // default to the first suggestion if available, otherwise use input value
+                    // use the first suggestion if available, otherwise use current input value
                     cityToSearch = suggestions[0] ? suggestions[0].textContent : searchInput.value;
                 }
 
                 searchInput.value = cityToSearch; // Set input value to the chosen city
-                autocompleteSuggestionsDiv.style.display = 'none'; // Hide suggestions
-                searchCity(); // Trigger search with the selected/chosen city
-                selectedIndex = -1; // Reset selection after search
+                searchCity(); // Trigger search with the selected/chosen city (searchCity will handle hiding)
             } else {
-                // If no suggestions are visible, search the current input value
+                // If no suggestions are visible, search the current input value directly
                 searchCity();
             }
         }
     });
 
-    // --- Initial State Setup on Page Load (existing) ---
+    // --- Initial State Setup on Page Load ---
     cityDisplay.textContent = currentCity;
     timeDisplay.textContent = "--:--";
-    horlogeContainer.style.display = 'none';
+    horlogeContainer.style.display = 'none'; // Clock is hidden by default
     isCitySearched = false;
+    toggleAutocompleteVisibility(); // Ensure autocomplete suggestions are hidden on initial page load
 
     // Initial clock update and then set interval
     updateClock();
-    setInterval(updateClock, 1000);
+    setInterval(updateClock, 1000); // Update clock every second
 });

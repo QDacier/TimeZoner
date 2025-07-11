@@ -1,20 +1,25 @@
+html {
+    height: 100%; /* Ensures the html element takes up the full viewport height */
+    overflow: hidden; /* Prevents any scrolling on the root element */
+}
+
 body {
     display: flex;
-    flex-direction: column; /* Stacks children vertically */
-    justify-content: flex-start; /* Aligns content from the start */
-    align-items: center; /* Centers content horizontally */
-    min-height: 100vh; /* Ensures body takes full viewport height */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100%; /* Ensures the body takes up the full height of the html element */
+    /* min-height: 100vh; is no longer strictly necessary when height: 100% is on html/body */
     background-color: #2c3e50;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ecf0f1;
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
-    overflow-y: auto; /* IMPORTANT: Allow vertical scrolling */
-    position: relative; /* Crucial for absolute positioning of search bar */
-    padding-bottom: 5px; /* Added back a small padding to ensure footer content is fully fully visible */
+    overflow: hidden; /* This is the key change: hides both horizontal and vertical scrollbars */
+    position: relative;
+    /* Removed padding-bottom: 5px; as it could introduce unwanted scroll space */
 }
 
-/* --- Search Bar Container (always visible, but its children hide/show) --- */
+/* --- Search Bar Container (always visible) --- */
 #search-bar-container {
     position: absolute;
     top: 20px;
@@ -26,12 +31,12 @@ body {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s ease, padding 0.3s ease; /* Example */
+    transition: background-color 0.3s ease, padding 0.3s ease;
 }
 
-/* --- Search Input (Hidden by default, using max-width for collapse animation) --- */
+/* --- Search Input (Always visible by default) --- */
 #search-input {
-    min-width: 0; /* Allows shrinking below content size */
+    min-width: 0;
     border: 2px solid transparent;
     color: #ecf0f1;
     font-size: 1.1em;
@@ -40,13 +45,11 @@ body {
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
     box-sizing: border-box;
 
-    /* --- Key changes for "display: none" like behavior with animation --- */
-    max-width: 0; /* Start at 0 width, effectively hidden */
-    padding: 0 0px; /* Collapse padding when hidden */
-    opacity: 0; /* Fully transparent */
-    overflow: hidden; /* Hide any content that exceeds max-width */
-    pointer-events: none; /* Prevent interaction when hidden */
-    transition: max-width 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out 0.1s; /* Add transitions */
+    max-width: 220px;
+    padding: 10px 15px;
+    opacity: 1;
+    pointer-events: auto;
+    transition: max-width 0.4s ease-out, padding 0.4s ease-out, opacity 0.3s ease-out 0.1s;
 }
 
 #search-input::placeholder {
@@ -58,68 +61,35 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* --- Search Button --- */
-#search-button {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 5px;
-    background-color: #3498db;
-    color: white;
-    font-size: 200%;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-#search-button:hover {
-    background-color: #2980b9;
-    transform: translateY(-1px);
-}
-
-#search-button:active {
-    background-color: #2073aa;
-    transform: translateY(0);
-}
-
-/* --- Autocomplete Suggestions (Hidden by default, using max-height for collapse animation) --- */
+/* --- Autocomplete Suggestions (Hidden by default, using max-height/opacity for collapse animation) --- */
 .autocomplete-suggestions {
     border: 1px solid #ccc;
-    /* max-height for the reveal animation, start at 0 */
     max-height: 0;
-    overflow: hidden; /* Hide content when collapsed */
-    opacity: 0; /* Fully transparent */
-    pointer-events: none; /* Prevent interaction when hidden */
-    position: absolute; /* Positions it below the search bar */
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    padding: 0;
+    position: absolute;
     background-color: #333;
     color: #eee;
-    z-index: 100; /* Ensure it's above other content */
+    z-index: 100;
     border-top: none;
     border-radius: 0 0 5px 5px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    top: calc(100% + 8px); /* Positions it below the search bar container */
+    top: calc(100% + 8px);
     left: 10px;
-    /* Add transition for max-height and opacity */
-    transition: max-height 0.4s ease-out, opacity 0.3s ease-out 0.1s;
-    /* Note: padding on suggestions needs to be set when visible, not when hidden */
-    padding: 0; /* Start with no padding when collapsed */
+    transition: max-height 0.4s ease-out, opacity 0.3s ease-out 0.1s, padding 0.4s ease-out;
+    display: none;
 }
 
-
-/* --- Show input and autocomplete when the search-bar-container is hovered --- */
-#search-bar-container:hover #search-input {
-    max-width: 220px; /* Expand to its desired width */
-    padding: 10px 15px; /* Restore original padding for input */
-    opacity: 1; /* Fully visible */
-    pointer-events: auto; /* Allow interaction */
+/* Styles for when the autocomplete suggestions are visible */
+.autocomplete-suggestions.is-visible {
+    max-height: 200px;
+    padding: 8px 15px;
+    opacity: 1;
+    pointer-events: auto;
+    display: block;
 }
-
-#search-bar-container:hover .autocomplete-suggestions {
-    max-height: 200px; /* Expand to allow content to show */
-    padding: 8px 15px; /* Restore original padding for suggestions */
-    opacity: 1; /* Fully visible */
-    pointer-events: auto; /* Allow interaction */
-}
-
 
 .autocomplete-suggestion-item.selected-suggestion {
     background-color: #3f51b5;
@@ -140,11 +110,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; /* Centers content vertically within its growing space */
-    flex-grow: 1; /* This wrapper will take up all available space */
-    width: 100%; /* Ensure it spans the width for alignment */
-    padding-top: 100px; /* Adjust this to push content down past the search bar for larger screens */
-    box-sizing: border-box; /* Include padding in total height */
+    justify-content: flex-start;
+    flex-grow: 1;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 10px;
+    /* Removed margin-top from here, as it's now controlled by the overall flex distribution */
 }
 
 /* --- City Name --- */
@@ -156,6 +127,16 @@ body {
     text-align: center;
     width: 80%;
     min-width: 250px;
+    margin: 0;
+}
+
+/* --- Digital Time Display --- */
+#heure {
+    font-size: 2.2em;
+    font-weight: bold;
+    text-shadow: 1.5px 1.5px 4.5px rgba(0,0,0,0.5);
+    z-index: 20;
+    margin: 0;
 }
 
 /* --- Clock Container (MAIN SCALING ELEMENT) --- */
@@ -172,6 +153,7 @@ body {
     transform-origin: center center;
 
     --clock-scale: 1; /* Default scale for larger screens */
+    margin: 0;
 }
 
 #horlogeBG {
@@ -347,21 +329,38 @@ body {
 }
 
 /* ###################################################################### */
+/* -------------------------------- Ecran -------------------------------- */
+/* ###################################################################### */
+@media (min-width: 1601px) {
+
+    /* --- Main Content Wrapper Adjustments for Larger Screens --- */
+    #main-content-wrapper {
+        margin-top: 5%; /* Keep this if you want a top margin on very large screens */
+    }
+
+    footer {
+        padding: 20px;
+    }
+
+}
+
+
+/* ###################################################################### */
 /* ------------------------------ Portables ------------------------------ */
 /* ###################################################################### */
-@media (max-width: 1100px) {
+@media (max-width: 1600px) {
 
     /* --- Main Content Wrapper Adjustments for Smaller Screens --- */
     #main-content-wrapper {
-        padding-top: 50px;
+        padding-top: 0px;
         padding-bottom: 50px;
     }
 
     /* --- Clock Scale Adjustment for "Portables" --- */
     #horloge {
-        --clock-scale: 0.7; /* Scale the entire clock (and its children) to 70% */
-        margin-top: 0px;    /* Stick to previous element */
-        margin-bottom: 0px; /* Stick to next element */
+        --clock-scale: 0.7;
+        margin-top: 0px;
+        margin-bottom: 0px;
     }
 
     /* --- Adjustments for City Name on Portables --- */
@@ -384,17 +383,20 @@ body {
         left: 15px;
     }
 
-    /* When container is hovered on smaller screens, expand input */
-    #search-bar-container:hover #search-input {
-        max-width: 200px; /* Adjusted initial width for smaller screens */
+    /* For smaller screens, ensure search input is always visible with appropriate width */
+    #search-input {
+        max-width: 200px;
         font-size: 1em;
+    }
+
+    footer {
+        padding-bottom: 50px;
     }
 }
 
 /* --- FOOTER STYLES --- */
 footer {
     width: 100%;
-    padding: 20px 0;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
     color: #aeb6bf;
     text-align: center;
