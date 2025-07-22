@@ -2,9 +2,11 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // DOM Elements
     const hourHand = document.getElementById('aigHr');
     const minuteHand = document.getElementById('aigMin');
-    const secondHand = document.getElementById('aigSec');
+    const secondHand = document.getElementById('aigSec'); // This is the second hand for the analog clock
     const cityDisplay = document.getElementById('ville');
     const timeDisplay = document.getElementById('heure');
+    const secondsCB = document.getElementById('secondable'); // This is your checkbox
+    const secondsLabel = document.querySelector('label[for="secondable"]');
     const horlogeContainer = document.getElementById('horloge');
     const horlogeBG = document.getElementById('horlogeBG');
     const sun = document.getElementById('sun');
@@ -20,7 +22,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let isCitySearched = false;
     let selectedIndex = -1; // To keep track of the currently selected suggestion
 
-    // Map des villes avec leurs fusieaux horaires
+    // Map des villes avec leurs fuseaux horaires
     const cityToTimezoneMap = {
         "london": { "timezone": "Europe/London", "displayName": "London, UK" },
         "paris": { "timezone": "Europe/Paris", "displayName": "Paris, France" },
@@ -337,13 +339,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
         let localHours, localMinutes, localSeconds;
         const orbitRadius = 180;
 
+        // Determine if seconds should be shown based on checkbox state
+        const showSeconds = secondsCB.checked;
+
         if (isCitySearched && currentIANAtimezone) {
             // --- Get Time Components for the Selected City's Timezone ---
             const formatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: currentIANAtimezone,
                 hour: 'numeric',
                 minute: 'numeric',
-                second: 'numeric',
+                second: 'numeric', // Always get seconds to allow for showing/hiding
                 hourCycle: 'h23' // Ensures 24-hour format for calculation
             });
 
@@ -362,12 +367,22 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
             hourHand.style.transform = `translate(-50%, -100%) rotate(${hourDegrees}deg)`;
             minuteHand.style.transform = `translate(-50%, -100%) rotate(${minuteDegrees}deg)`;
+
+            // Conditionally show/hide the analog second hand
             secondHand.style.transform = `translate(-50%, -100%) rotate(${secondDegrees}deg)`;
+            secondHand.style.display = showSeconds ? 'block' : 'none';
 
             // ------------------- Update Digital Time Display -------------------
             const formattedHours = String(localHours).padStart(2, '0');
             const formattedMinutes = String(localMinutes).padStart(2, '0');
-            timeDisplay.textContent = `${formattedHours}:${formattedMinutes}`;
+            let digitalTimeText = `${formattedHours}:${formattedMinutes}`;
+
+            // Conditionally add seconds to digital display
+            if (showSeconds) {
+                const formattedSeconds = String(localSeconds).padStart(2, '0');
+                digitalTimeText += `:${formattedSeconds}`;
+            }
+            timeDisplay.textContent = digitalTimeText;
 
             // ------------------- Control Sun and Moon Orbit -------------------
             const totalMinutesOfDay = localHours * 60 + localMinutes;
@@ -386,8 +401,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             // --- Day/Night Background Color Change based on specific sky stages ---
             let r, g, b;
 
-            const midnightDeepColor = { r: 15, g: 15, b: 30 };    // Very deep indigo (00:00, 24:00)
-            const preDawnDarkColor = { r: 30, g: 20, b: 60 };    // Dark purple-blue (around 04:00)
+            const midnightDeepColor = { r: 15, g: 15, b: 30 };     // Very deep indigo (00:00, 24:00)
+            const preDawnDarkColor = { r: 30, g: 20, b: 60 };     // Dark purple-blue (around 04:00)
             const dawnLightColor = { r: 100, g: 80, b: 120 };  // Muted purple-grey (around 05:00)
             const dawnOrangePinkColor = { r: 255, g: 120, b: 80 };  // Soft orange-pink (around 06:00)
             const sunrisePeakColor = { r: 255, g: 180, b: 70 };  // Vibrant orange/yellow (around 07:00)
@@ -395,8 +410,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const middayBrightColor = { r: 173, g: 216, b: 230 }; // Lightest mid-day blue (around 12:00-15:00)
             const goldenHourColor = { r: 255, g: 215, b: 100 }; // Warm yellow/orange (around 17:00)
             const sunsetPeakColor = { r: 255, g: 99, b: 71 };   // Intense red-orange (around 18:00)
-            const twilightPurpleColor = { r: 80, g: 0, b: 120 };    // Dark violet (around 19:00)
-            const earlyNightDarkColor = { r: 25, g: 25, b: 70 };    // Darkening blue-purple (around 21:00)
+            const twilightPurpleColor = { r: 80, g: 0, b: 120 };     // Dark violet (around 19:00)
+            const earlyNightDarkColor = { r: 25, g: 25, b: 70 };     // Darkening blue-purple (around 21:00)
 
 
             // Calculate total minutes past midnight for interpolation (0 to 1439)
@@ -468,17 +483,18 @@ document.addEventListener('DOMContentLoaded', (event) => {
             body.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 
         } else {
-            // --- Valeurs par defau quand aucune ville selectionne ---
+            // --- Default values when no city is selected ---
 
             // Set hands to 12:00
             hourHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
             minuteHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
-            secondHand.style.transform = `translate(-50%, -100%) rotate(0deg)`;
+            // Hide second hand if no city is searched, regardless of checkbox
+            secondHand.style.display = 'none';
 
-            // heure digital par defaut
+            // Digital time default
             timeDisplay.textContent = "--:--";
 
-            // Sun/Moon orbit par defaut
+            // Sun/Moon orbit default
             const utcHours = now.getUTCHours();
             const utcMinutes = now.getUTCMinutes();
             const utcSeconds = now.getUTCSeconds();
@@ -494,7 +510,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             sun.style.transform = `translate(-50%, -50%) rotate(${finalRotateSunAngleUTC}deg) translateX(${orbitRadius}px) rotate(${-finalRotateSunAngleUTC}deg)`;
             moon.style.transform = `translate(-50%, -50%) rotate(${finalRotateMoonAngleUTC}deg) translateX(${orbitRadius}px) rotate(${-finalRotateMoonAngleUTC}deg)`;
 
-            // couleur background par defaut
+            // Default background color
             body.style.backgroundColor = `rgb(22, 31, 40)`;
         }
 
@@ -524,42 +540,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    //Recherche de la ville dans la map
+    // City search logic
     async function searchCity() {
         const city = searchInput.value.trim();
         if (!city) {
-            alert("Please enter a city name.");
+            toggleAutocompleteVisibility(); // Hide suggestions
             return;
         }
 
-        // en minuscule pour ne pas etre trop sensible a la case
+        // Convert to lowercase for case-insensitive search
         let lowerCaseCity = city.toLowerCase();
         let cityData = cityToTimezoneMap[lowerCaseCity];
 
+        // If direct match not found, check display names
         if (!cityData) {
             for (const key in cityToTimezoneMap) {
                 if (cityToTimezoneMap[key].displayName.toLowerCase() === lowerCaseCity) {
                     cityData = cityToTimezoneMap[key];
-                    lowerCaseCity = key;
+                    lowerCaseCity = key; // Update key to ensure proper internal lookup if needed
                     break;
                 }
             }
         }
 
         if (cityData) {
-            // ville trouve
+            // City found
             currentIANAtimezone = cityData.timezone;
             currentCity = cityData.displayName;
             isCitySearched = true;
-            horlogeContainer.style.display = 'flex';
+            horlogeContainer.style.display = 'flex'; // Show the clock container
 
-            updateClock();
-            searchInput.value = ""; // vide bar de recherche
+            updateClock(); // Update clock immediately after setting new city
+            searchInput.value = ""; // Clear search bar
             autocompleteSuggestionsDiv.classList.remove('is-visible'); // Hide suggestions after search
             autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions content
             selectedIndex = -1; // Reset selection after search
         } else {
-            // ville introuvable
+            // City not found
             alert(
                 `The city "${city}" is not found in our list.\n` +
                 "Please check spelling or try another city from the predefined list."
@@ -567,13 +584,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
             isCitySearched = false;
             currentIANAtimezone = null;
             currentCity = "Search for a City";
-            horlogeContainer.style.display = 'none';
+            horlogeContainer.style.display = 'none'; // Hide the clock container
 
             // Reset visual elements to their default "no city" state
             hourHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
             minuteHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
-            secondHand.style.transform = "translate(-50%, -100%) rotate(0deg)";
-            body.style.backgroundColor = "rgb(22, 31, 40)"; // Ensure it resets to black/dark
+            secondHand.style.display = 'none'; // Ensure second hand is hidden
+            body.style.backgroundColor = "rgb(22, 31, 40)"; // Ensure it resets to dark
             autocompleteSuggestionsDiv.classList.remove('is-visible'); // Hide suggestions on failed search
             autocompleteSuggestionsDiv.innerHTML = ''; // Clear suggestions content
             selectedIndex = -1; // Reset selection on failed search
@@ -708,12 +725,19 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 
+    // --- Event Listener for Seconds Checkbox ---
+    secondsCB.addEventListener('change', updateClock);
+
+
     // --- Initial State Setup on Page Load ---
     cityDisplay.textContent = currentCity;
     timeDisplay.textContent = "--:--";
     horlogeContainer.style.display = 'none'; // Clock is hidden by default
     isCitySearched = false;
     toggleAutocompleteVisibility(); // Ensure autocomplete suggestions are hidden on initial page load
+
+    // Set initial state of second hand based on checkbox (it's unchecked by default)
+    secondHand.style.display = 'none'; // Initially hide the analog second hand
 
     // Initial clock update and then set interval
     updateClock();

@@ -353,7 +353,7 @@ body {
     /* --- Main Content Wrapper Adjustments for Smaller Screens --- */
     #main-content-wrapper {
         padding-top: 0px;
-        padding-bottom: 50px;
+        padding-bottom: 25px;
     }
 
     /* --- Clock Scale Adjustment for "Portables" --- */
