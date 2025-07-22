@@ -398,16 +398,73 @@ body {
 /* -------------------------------- Cell -------------------------------- */
 /* ###################################################################### */
 @media (max-width: 600px) {
-
-    /* --- Main Content Wrapper Adjustments for Larger Screens --- */
     #main-content-wrapper {
-        margin-top: 5%; /* Keep this if you want a top margin on very large screens */
+        margin-top: 0%;
+        padding-top: 15px;
+        padding-bottom: 20px;
+        justify-content: center;
+        min-height: auto;
+    }
+
+    #horloge {
+        --clock-scale: 0.6;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        width: 300px;
+        height: 300px;
+    }
+
+    #ville {
+        font-size: 1.8em;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        width: 90%;
+        min-width: unset;
+    }
+
+    #heure {
+        font-size: 1.8em;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+
+    #search-bar-container {
+        position: static;
+        width: 90%;
+        margin: 10px auto;
+        flex-direction: column;
+        align-items: center;
+        left: auto;
+        top: auto;
+        gap: 5px;
+    }
+
+    #search-input {
+        width: 100%;
+        max-width: 250px;
+        font-size: 1em;
+        padding: 8px 10px;
+    }
+
+    .autocomplete-suggestions {
+        position: static;
+        width: 100%;
+        left: auto;
+        top: auto;
+        border-radius: 5px;
+        border-top: 1px solid #ccc;
+        margin-top: 5px;
+    }
+
+    .autocomplete-suggestion-item {
+        padding: 6px 10px;
+        font-size: 0.9em;
     }
 
     footer {
-        padding: 20px;
+        padding: 10px;
+        font-size: 0.75em;
     }
-
 }
 
 /* --- FOOTER STYLES --- */
