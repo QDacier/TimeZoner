@@ -348,7 +348,7 @@ body {
 /* ###################################################################### */
 /* ------------------------------ Portables ------------------------------ */
 /* ###################################################################### */
-@media (max-width: 1600px) {
+@media (min-width: 601px) and (max-width: 1600px) {
 
     /* --- Main Content Wrapper Adjustments for Smaller Screens --- */
     #main-content-wrapper {
@@ -392,6 +392,22 @@ body {
     footer {
         padding-bottom: 50px;
     }
+}
+
+/* ###################################################################### */
+/* -------------------------------- Cell -------------------------------- */
+/* ###################################################################### */
+@media (max-width: 600px) {
+
+    /* --- Main Content Wrapper Adjustments for Larger Screens --- */
+    #main-content-wrapper {
+        margin-top: 5%; /* Keep this if you want a top margin on very large screens */
+    }
+
+    footer {
+        padding: 20px;
+    }
+
 }
 
 /* --- FOOTER STYLES --- */
