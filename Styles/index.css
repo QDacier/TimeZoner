@@ -484,14 +484,12 @@ footer {
 footer p {
     margin: 0;
     line-height: 1.5;
-    border: 2px solid black;
 }
 
 footer a {
     color: #3498db;
     text-decoration: none;
     transition: color 0.3s ease;
-    border: 2px solid blue;
 }
 
 footer a:hover {
