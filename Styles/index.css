@@ -1,6 +1,6 @@
 html {
-    height: 100%; /* Ensures the html element takes up the full viewport height */
-    overflow: hidden; /* Prevents any scrolling on the root element */
+    height: 100%;
+    overflow: hidden;
 }
 
 body {
@@ -8,18 +8,15 @@ body {
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    height: 100%; /* Ensures the body takes up the full height of the html element */
-    /* min-height: 100vh; is no longer strictly necessary when height: 100% is on html/body */
+    height: 100%;
     background-color: #2c3e50;
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ecf0f1;
-    overflow: hidden; /* This is the key change: hides both horizontal and vertical scrollbars */
+    overflow: hidden;
     position: relative;
-    /* Removed padding-bottom: 5px; as it could introduce unwanted scroll space */
 }
 
-/* --- Search Bar Container (always visible) --- */
 #search-bar-container {
     position: absolute;
     top: 20px;
@@ -34,7 +31,6 @@ body {
     transition: background-color 0.3s ease, padding 0.3s ease;
 }
 
-/* --- Search Input (Always visible by default) --- */
 #search-input {
     min-width: 0;
     border: 2px solid transparent;
@@ -61,7 +57,6 @@ body {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* --- Autocomplete Suggestions (Hidden by default, using max-height/opacity for collapse animation) --- */
 .autocomplete-suggestions {
     border: 1px solid #ccc;
     max-height: 0;
@@ -82,7 +77,6 @@ body {
     display: none;
 }
 
-/* Styles for when the autocomplete suggestions are visible */
 .autocomplete-suggestions.is-visible {
     max-height: 200px;
     padding: 8px 15px;
@@ -105,7 +99,6 @@ body {
     background-color: #555;
 }
 
-/* --- Main Content Wrapper --- */
 #main-content-wrapper {
     display: flex;
     flex-direction: column;
@@ -115,10 +108,8 @@ body {
     width: 100%;
     box-sizing: border-box;
     gap: 10px;
-    /* Removed margin-top from here, as it's now controlled by the overall flex distribution */
 }
 
-/* --- City Name --- */
 #ville {
     font-size: 2.2em;
     font-weight: bold;
@@ -130,7 +121,6 @@ body {
     margin: 0;
 }
 
-/* --- Digital Time Display --- */
 #heure {
     font-size: 2.2em;
     font-weight: bold;
@@ -139,7 +129,6 @@ body {
     margin: 0;
 }
 
-/* --- Clock Container (MAIN SCALING ELEMENT) --- */
 #horloge {
     position: relative;
     width: 450px;
@@ -147,12 +136,12 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    display: none; /* Hidden by default, shown on city search by JS */
+    display: none;
 
     transform: scale(var(--clock-scale, 1));
     transform-origin: center center;
 
-    --clock-scale: 1; /* Default scale for larger screens */
+    --clock-scale: 1;
     margin: 0;
 }
 
@@ -168,7 +157,6 @@ body {
     -webkit-backdrop-filter: blur(12px);
 }
 
-/* --- Hour Marks (Numbers and Lines) --- */
 .hour-mark-container {
     position: absolute;
     top: 50%;
@@ -200,7 +188,6 @@ body {
     transform: translateX(-50%);
 }
 
-/* --- Clock Hands (Aiguilles) --- */
 #centre {
     width: 15px;
     height: 15px;
@@ -246,7 +233,6 @@ body {
     border: 1px solid darkred;
 }
 
-/* --- Sun and Moon --- */
 #sun, #moon {
     position: absolute;
     top: 50%;
@@ -271,7 +257,6 @@ body {
     box-shadow: inset -7px -7px 15px rgba(0,0,0,0.3);
 }
 
-/* --- Digital Time Display --- */
 #heure {
     font-size: 2.2em;
     font-weight: bold;
@@ -279,7 +264,6 @@ body {
     z-index: 20;
 }
 
-/* --- Responsive Scaling for the Clock (General Media Queries) --- */
 @media (max-height: 700px) {
     #horloge {
         --clock-scale: 0.8;
@@ -333,9 +317,9 @@ body {
 /* ###################################################################### */
 @media (min-width: 1601px) {
 
-    /* --- Main Content Wrapper Adjustments for Larger Screens --- */
+
     #main-content-wrapper {
-        margin-top: 5%; /* Keep this if you want a top margin on very large screens */
+        margin-top: 5%;
     }
 
     footer {
@@ -350,40 +334,34 @@ body {
 /* ###################################################################### */
 @media (min-width: 601px) and (max-width: 1600px) {
 
-    /* --- Main Content Wrapper Adjustments for Smaller Screens --- */
     #main-content-wrapper {
         padding-top: 0px;
         padding-bottom: 25px;
     }
 
-    /* --- Clock Scale Adjustment for "Portables" --- */
     #horloge {
         --clock-scale: 0.7;
         margin-top: 0px;
         margin-bottom: 0px;
     }
 
-    /* --- Adjustments for City Name on Portables --- */
     #ville {
         font-size: 2em;
         margin-top: 0px;
         margin-bottom: 0px;
     }
-
-    /* --- Adjustments for Digital Time Display on Portables --- */
+    
     #heure {
         font-size: 2em;
         margin-top: 0px;
         margin-bottom: 0px;
     }
 
-    /* Adjust search bar container position for smaller screens */
     #search-bar-container {
         top: 15px;
         left: 15px;
     }
 
-    /* For smaller screens, ensure search input is always visible with appropriate width */
     #search-input {
         max-width: 200px;
         font-size: 1em;
@@ -467,7 +445,6 @@ body {
     }
 }
 
-/* --- FOOTER STYLES --- */
 footer {
     width: 100%;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0));
